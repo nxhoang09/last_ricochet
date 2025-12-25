@@ -1,0 +1,17 @@
+[package]
+name = "last_ricochet"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "0.14", features = ["default", "vorbis", "wav", "mp3"] }
+log = "0.4"
+rand = "0.8"
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
