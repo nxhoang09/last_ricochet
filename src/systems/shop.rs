@@ -6,7 +6,6 @@ use crate::resources::level::LevelManager;
 use crate::resources::sound::SoundAssets;
 use crate::states::AppState;
 
-// --- COMPONENTS ---
 #[derive(Component)]
 pub struct ShopUI;
 
@@ -30,12 +29,10 @@ pub struct ShopInfoText;
 #[derive(Component)]
 pub struct NextLevelZone;
 
-// --- CONSTANTS ---
 const FONT_PATH: &str = "fonts/pixel_3.ttf";
 const SHOP_ITEM_SCALE: f32 = 1.2; 
 const SHOP_TABLE_Y: f32 = -120.0; 
 
-// --- SYSTEM: SETUP SHOP ---
 pub fn setup_shop(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -47,7 +44,6 @@ pub fn setup_shop(
         transform.translation = Vec3::new(0.0, -250.0, 5.0);
     }
 
-    // 2. Spawn Background
     commands.spawn((
         SpriteBundle {
             texture: bg_texture,
@@ -101,7 +97,6 @@ pub fn setup_shop(
         });
     });
 
-    //Spawn UI Thông tin
     commands.spawn((
         TextBundle::from_section(
             "",
@@ -132,8 +127,8 @@ fn spawn_shop_item(
     buff_type: BuffType
 ) {
     let (name, cost, desc) = match buff_type {
-        BuffType::Heal => ("Healing Potion", 5, "+1 HP"),
-        BuffType::DamageUp => ("Power Elixir", 10, "+1 Damage"),
+        BuffType::Heal => ("Healing Potion", 2, "+1 HP"),
+        BuffType::DamageUp => ("Power Elixir", 4, "+1 Damage"),
     };
 
     commands.spawn((
@@ -167,7 +162,7 @@ pub fn shop_interaction(
 
     let mut near_any_item = false;
 
-    for (entity, item_transform, item) in item_query.iter() {
+    for (_, item_transform, item) in item_query.iter() {
         let distance = player_transform.translation.distance(item_transform.translation);
 
         if distance < 60.0 { 
@@ -215,7 +210,6 @@ pub fn shop_interaction(
     }
 }
 
-// --- SYSTEM: NEXT LEVEL CHECK (Giữ nguyên) ---
 pub fn shop_next_level(
     player_query: Query<&Transform, With<Player>>,
     zone_query: Query<&Transform, With<NextLevelZone>>,

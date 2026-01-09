@@ -4,7 +4,7 @@ use std::f32::consts::TAU;
 use crate::components::bullet::Bullet;
 use crate::components::collider::{Collider, Wall};
 use crate::components::item::Coin;
-use crate::components::player::{Player, Aura};
+use crate::components::player::Player;
 use crate::components::enemy::{Enemy, Damage, Health};
 use crate::components::stats::PlayerStats;
 use crate::components::particle::{Particle, Velocity, Lifetime};
@@ -166,7 +166,7 @@ pub fn bullet_enemy_collision(
 ) {
     let mut rng = rand::thread_rng();
     
-    for (bullet_entity, bullet_transform, bullet_collider, mut bullet) in bullet_query.iter_mut() {
+    for (_, bullet_transform, bullet_collider, mut bullet) in bullet_query.iter_mut() {
         bullet.hit_entities.retain(|&enemy_id| {
             if let Ok((_, enemy_transform, enemy_collider, _, _, _)) = enemy_query.get(enemy_id) {
                 let collision = check_collision(
@@ -181,9 +181,8 @@ pub fn bullet_enemy_collision(
             }
         });
 
-        for (enemy_entity, enemy_transform, enemy_collider, mut enemy_health, mut sprite, mut existing_flash) in enemy_query.iter_mut() {
+        for (enemy_entity, enemy_transform, enemy_collider, mut enemy_health, mut sprite, existing_flash) in enemy_query.iter_mut() {
             
-            // Nếu quái này đang nằm trong danh sách "đã bắn" -> Bỏ qua
             if bullet.hit_entities.contains(&enemy_entity) {
                 continue;
             }
@@ -196,10 +195,8 @@ pub fn bullet_enemy_collision(
             );
 
             if collision != CollisionSide::None {
-                // 1. Ghi nhớ là đã bắn trúng
                 bullet.hit_entities.push(enemy_entity);
 
-                // 2. Trừ máu (chỉ 1 lần duy nhất cho mỗi lượt đi qua)
                 enemy_health.current -= bullet.damage;
                 println!("Enemy Hit! HP: {}/{}", enemy_health.current, enemy_health.max);
                 if let Some(mut flash) = existing_flash {
@@ -208,15 +205,14 @@ pub fn bullet_enemy_collision(
                 else {
                     let original_color = sprite.color; 
                     
-                    sprite.color = Color::rgb(1.0, 0.0, 0.0); 
+                    sprite.color = Color::srgb(1.0, 0.0, 0.0); 
 
                     commands.entity(enemy_entity).insert(HitFlash {
                         timer: Timer::from_seconds(0.1, TimerMode::Once),
-                        original_color: original_color,
+                        original_color,
                     });
                 }
 
-                // 3. Xử lý chết
                 if enemy_health.current <= 0.0 {
                     ev_shake.send(ScreenShakeEvent { 
                         intensity: 2.0, 
@@ -229,10 +225,12 @@ pub fn bullet_enemy_collision(
                     spawn_death_particles(&mut commands, enemy_transform.translation);
                     commands.entity(enemy_entity).despawn_recursive();
                     if rng.gen_bool(DROP_RATE) {
+                        let coin_transform = Transform::from_translation(enemy_transform.translation)
+                            .with_scale(Vec3::splat(1.0));
                         commands.spawn((
                             SpriteBundle {
                                 texture: game_assets.coin_texture.clone(),
-                                transform: *enemy_transform,
+                                transform: coin_transform,
                                 sprite: Sprite {
                                     custom_size: Some(Vec2::splat(24.0)), 
                                     ..default()
@@ -256,8 +254,12 @@ pub fn enemy_player_collision(
     mut player_query: Query<(&Transform, &Collider, &mut Health, &mut PlayerStats), With<Player>>, 
     mut ev_shake: EventWriter<ScreenShakeEvent>,
     enemy_query: Query<(Entity, &Transform, &Collider, &Damage), With<Enemy>>,
-    sound_assets: Res<SoundAssets>
+    sound_assets: Res<SoundAssets>,
+    game_assets: Res<GameAssets>
 ) {
+    let mut rng = rand::thread_rng();
+
+
     if let Ok((player_transform, player_collider, mut player_health, mut player_stats)) = player_query.get_single_mut() {
         
         for (enemy_entity, enemy_transform, enemy_collider, damage) in enemy_query.iter() {
@@ -278,7 +280,26 @@ pub fn enemy_player_collision(
                     duration: 0.1 
                 });
                 player_health.current -= damage.amount;
-                player_stats.current_hp -= damage.amount; 
+                player_stats.current_hp -= damage.amount;
+
+                if rng.gen_bool(DROP_RATE){
+                    let coin_transform = Transform::from_translation(enemy_transform.translation)
+                        .with_scale(Vec3::splat(1.0));
+
+                    commands.spawn((
+                        SpriteBundle {
+                            texture: game_assets.coin_texture.clone(),
+                            transform: coin_transform,
+                            sprite: Sprite {
+                                custom_size: Some(Vec2::splat(24.0)), 
+                                ..default()
+                            },
+                            ..default()
+                        },
+                        Coin { value: 1 }, 
+                        Collider::new(24.0, 24.0),
+                    ));
+                } 
 
                 commands.entity(enemy_entity).despawn_recursive();
 
@@ -317,46 +338,46 @@ fn spawn_death_particles(commands: &mut Commands, position: Vec3) {
     }
 }
 
-pub fn draw_colliders(
-    mut gizmos: Gizmos,
-    player_query: Query<(&Transform, &Collider), With<Player>>,
-    wall_query: Query<(&Transform, &Collider), With<Wall>>,
-    aura_query: Query<&GlobalTransform, With<Aura>>,
-    enemy_query: Query<(&Transform, &Collider), With<Enemy>>,
-) {
+// pub fn draw_colliders(
+//     mut gizmos: Gizmos,
+//     player_query: Query<(&Transform, &Collider), With<Player>>,
+//     wall_query: Query<(&Transform, &Collider), With<Wall>>,
+//     aura_query: Query<&GlobalTransform, With<Aura>>,
+//     enemy_query: Query<(&Transform, &Collider), With<Enemy>>,
+// ) {
   
-    for (transform, collider) in player_query.iter() {
-        gizmos.rect_2d(
-            transform.translation.truncate(),
-            0.0,
-            collider.size,
-            Color::srgb(0.0, 1.0, 0.0), // Xanh lá
-        );
-    }
+//     for (transform, collider) in player_query.iter() {
+//         gizmos.rect_2d(
+//             transform.translation.truncate(),
+//             0.0,
+//             collider.size,
+//             Color::srgb(0.0, 1.0, 0.0), // Xanh lá
+//         );
+//     }
     
-    for (transform, collider) in wall_query.iter() {
-        gizmos.rect_2d(
-            transform.translation.truncate(),
-            0.0,
-            collider.size,
-            Color::srgb(1.0, 0.0, 0.0), // Đỏ
-        );
-    }
+//     for (transform, collider) in wall_query.iter() {
+//         gizmos.rect_2d(
+//             transform.translation.truncate(),
+//             0.0,
+//             collider.size,
+//             Color::srgb(1.0, 0.0, 0.0), // Đỏ
+//         );
+//     }
 
-    const AURA_RADIUS: f32 = 60.0;
-    for global_transform in aura_query.iter() {
-        gizmos.circle_2d(
-            global_transform.translation().truncate(),
-            AURA_RADIUS,
-            Color::srgb(0.0, 1.0, 1.0), // Cyan
-        );
-    }
-    for (transform, collider) in enemy_query.iter() {
-        gizmos.rect_2d(
-            transform.translation.truncate(),
-            0.0,
-            collider.size,
-            Color::srgb(1.0, 0.5, 0.5), 
-        );
-    }
-}
+//     const AURA_RADIUS: f32 = 60.0;
+//     for global_transform in aura_query.iter() {
+//         gizmos.circle_2d(
+//             global_transform.translation().truncate(),
+//             AURA_RADIUS,
+//             Color::srgb(0.0, 1.0, 1.0), // Cyan
+//         );
+//     }
+//     for (transform, collider) in enemy_query.iter() {
+//         gizmos.rect_2d(
+//             transform.translation.truncate(),
+//             0.0,
+//             collider.size,
+//             Color::srgb(1.0, 0.5, 0.5), 
+//         );
+//     }
+// }

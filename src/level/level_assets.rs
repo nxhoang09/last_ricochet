@@ -9,7 +9,6 @@ pub const TILESET_PATH: &str = "sprites/tiles/tileset.png";
 
 #[derive(Resource)]
 pub struct LevelAssets {
-    // Sửa thành Vec để chứa nhiều map
     pub map_handles: Vec<Handle<Image>>, 
     pub track_maps: Vec<Handle<Image>>,
     
@@ -63,7 +62,6 @@ pub struct GameAssets {
 pub fn setup_game_assets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let coin_texture = asset_server.load("sprites/ui/coin.png");
 

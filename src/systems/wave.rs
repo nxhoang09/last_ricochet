@@ -11,7 +11,7 @@ const TILE_SIZE: f32 = 48.0;
 const MAP_COLS: f32 = 28.0;
 const MAP_ROWS: f32 = 15.0;
 const GOLEM_SIZE: f32 = 64.0;
-const GOLEM_HITBOX: f32 = 28.0;
+const GOLEM_HITBOX: f32 = 25.0;
 const MAX_LEVEL: usize = 3;
 
 
@@ -102,7 +102,7 @@ fn spawn_single_enemy(
     
     let (base_hp, base_speed, color_tint, scale) = match enemy_type {
         EnemyType::Normal => (2.0, 100.0, Color::WHITE,1.5),
-        EnemyType::Tank => (3.0, 40.0, Color::srgb(0.5, 0.5, 1.0),3.0),   
+        EnemyType::Tank => (3.0, 60.0, Color::srgb(0.5, 0.5, 1.0),3.0),   
         EnemyType::Speed => (1.0, 180.0, Color::srgb(1.0, 0.5, 0.5),1.0), 
     };
 

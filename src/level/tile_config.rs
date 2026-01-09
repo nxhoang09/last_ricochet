@@ -4,7 +4,6 @@ pub struct TileConfig {
     pub z: f32,
 }
 
-// index = sprite index = grayscale value
 pub const TILE_CONFIGS: [TileConfig; 28] = [
     TileConfig { has_collision: true, z: 10.0 }, // 0 
     TileConfig { has_collision: true,  z: 10.0  }, // 1 

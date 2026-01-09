@@ -4,7 +4,6 @@ use crate::components::player::{Player, Aura, HasAura};
 use crate::components::bullet::Bullet;
 
 const AURA_RADIUS: f32 = 60.0;             
-// Đường kính hiển thị (Visual) có thể to hơn vùng logic một chút cho đẹp (x 2.2)
 const AURA_DIAMETER: f32 = AURA_RADIUS * 2.2; 
 
 const AURA_PATH: &str = "sprites/ui/aura.png";
@@ -15,9 +14,8 @@ const ALPHA_ACTIVE: f32 = 0.2;
 
 const AURA_COLOR: Color = Color::srgb(0.0, 1.0, 1.0);
 
-const BULLET_SPEED_NORMAL: f32 = 400.0;
 const BULLET_SPEED_SLOW: f32 = 50.0;
-const BULLET_SPEED_KICK: f32 = 800.0; 
+const BULLET_SPEED_KICK: f32 = 400.0; 
 
 const ROTATE_SPEED_NORMAL: f32 = 1.5; 
 const ROTATE_SPEED_ACTIVE: f32 = 10.0;
@@ -53,7 +51,6 @@ pub fn spawn_aura(
     }
 }
 
-// --- 2. HỆ THỐNG VISUAL (MÀU + XOAY) ---
 pub fn aura_visual_system(
     time: Res<Time>, 
     keyboard_input: Res<ButtonInput<KeyCode>>,

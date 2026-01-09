@@ -18,14 +18,14 @@ use components::enemy::Health;
 
 use resources::level::LevelManager;
 use resources::game_stats::GameStats;
-use resources::sound::{SoundAssets, setup_sound_assets, start_background_music_when_ready, stop_background_music};
+use resources::sound::{setup_sound_assets, start_background_music_when_ready, stop_background_music};
 
 use systems::{
     aura::{spawn_aura, aura_visual_system, aura_logic_system},
     movement::player_movement,
     ui::{setup_ui, update_ui, check_game_over, update_wave_ui, update_timer_ui, cleanup_game_ui}, 
     shooting::{setup_bullet_assets, spawn_bullet, move_and_animate_bullet, cleanup_bullet_bounds},
-    ricochet::{bullet_ricochet, player_wall_collision, enemy_player_collision, enemy_wall_collision, bullet_enemy_collision, draw_colliders},
+    ricochet::{bullet_ricochet, player_wall_collision, enemy_player_collision, enemy_wall_collision, bullet_enemy_collision},
     enemy_ai::{enemy_movement, animate_enemies},
     particle::update_particles,
     gameplay::{player_collect_coin, reset_player_position, reset_game_state, despawn_all_enemies, cleanup_level_items},
@@ -44,7 +44,7 @@ const TILE_SIZE: f32 = 48.0;
 
 fn main() {
     App::new()
-        // --- 1. PLUGINS & WINDOW ---
+        // PLUGINS & WINDOW 
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()).set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Last Ricochet".into(),
@@ -55,15 +55,15 @@ fn main() {
         }))
         .add_plugins(VfxPlugin)
 
-        // --- 2. STATES & RESOURCES ---
+        // STATES & RESOURCES
         .init_state::<AppState>()
         .init_resource::<LevelManager>()
         .init_resource::<GameStats>()
         
-        // --- 3. STARTUP ---
+        // STARTUP
         .add_systems(Startup, (setup, setup_bullet_assets, setup_level_assets, setup_game_assets, setup_sound_assets))
 
-        // --- 4. STATE: MENU ---
+        // STATE: MENU
         .add_systems(OnEnter(AppState::Menu), setup_menu)
         .add_systems(Update, menu_action.run_if(in_state(AppState::Menu)))
         .add_systems(
@@ -72,7 +72,7 @@ fn main() {
         )
         .add_systems(OnExit(AppState::Menu), (cleanup_menu, reset_game_state))
         
-        // --- 5. STATE: PLAYING ---
+        // STATE: PLAYING
         .add_systems(OnEnter(AppState::Playing), (spawn_level_from_image, setup_ui, reset_player_position))
         .add_systems(OnExit(AppState::Playing), (despawn_map, cleanup_game_ui, despawn_all_enemies, cleanup_level_items))
 
@@ -110,14 +110,12 @@ fn main() {
                 wave_system,
                 player_collect_coin,
                 update_particles,
-                draw_colliders,
             ).run_if(in_state(AppState::Playing))
         )
 
-        // --- 6. STATE: BUFF SCREEN (SHOP) ---
+        // STATE: BUFF SCREEN
         .add_systems(OnEnter(AppState::BuffScreen), (setup_shop, despawn_map, setup_ui))
         
-        // Update: Cho phép di chuyển, tương tác shop, update tiền khi mua
         .add_systems(
             Update,
             (
@@ -128,15 +126,14 @@ fn main() {
             ).run_if(in_state(AppState::BuffScreen))
         )
 
-        // OnExit: Dọn dẹp Shop UI và Game UI
         .add_systems(OnExit(AppState::BuffScreen), (cleanup_shop, cleanup_game_ui))
 
-        // --- 7. STATE: VICTORY ---
+        // STATE: VICTORY
         .add_systems(OnEnter(AppState::Victory), (setup_victory, stop_background_music)) 
         .add_systems(Update, endgame_action.run_if(in_state(AppState::Victory)))
         .add_systems(OnExit(AppState::Victory), (cleanup_endgame, reset_game_state)) 
 
-        // --- 8. STATE: GAME OVER ---
+        //STATE: GAME OVER 
         .add_systems(OnEnter(AppState::GameOver), (setup_game_over, stop_background_music))
         .add_systems(Update, endgame_action.run_if(in_state(AppState::GameOver)))
         .add_systems(OnExit(AppState::GameOver), (cleanup_endgame, reset_game_state))
@@ -169,6 +166,6 @@ fn setup(
         MovementStats::default(),
         PlayerStats::default(),
         Health::new(5.0), 
-        Collider::new(39.0, 39.0),
+        Collider::new(30.0, 33.0),
     ));
 }

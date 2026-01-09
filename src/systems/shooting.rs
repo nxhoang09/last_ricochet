@@ -9,7 +9,7 @@ use crate::resources::sound::SoundAssets;
 
 const BULLET_SPRITE_PATH: &str = "sprites/bullet/bullet.png";
 const BULLET_SIZE: f32 = 16.0;
-const BULLET_COST: u32 = 1;
+const BULLET_COST: u32 = 3;
 const BULLET_FRAMES: usize = 4;
 
 #[derive(Resource)]

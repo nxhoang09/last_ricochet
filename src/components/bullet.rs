@@ -15,8 +15,8 @@ impl Default for Bullet {
     fn default() -> Self {
         Self {
             direction: Vec2::X,
-            speed: 400.0,
-            lifetime: Timer::from_seconds(5.0, TimerMode::Once),
+            speed: 350.0,
+            lifetime: Timer::from_seconds(12.0, TimerMode::Once),
             animation_timer: Timer::from_seconds(0.1, TimerMode::Repeating),
             is_despawning: false,
             hit_entities: Vec::new(),

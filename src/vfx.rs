@@ -36,7 +36,6 @@ fn handle_screen_shake(
             });
         }
         
-        // Thực hiện rung
         if let Some(mut shaker) = shaker_opt {
             if shaker.original_pos.is_none() {
                 shaker.original_pos = Some(transform.translation);

@@ -21,7 +21,7 @@ pub struct TimerText;
 #[derive(Component)]
 pub struct GameUI;
 
-// --- SETUP HUD (MÁU, TIỀN, WAVE, TIMER) ---
+//SETUP HUD
 pub fn setup_ui(
     mut commands: Commands, 
     asset_server: Res<AssetServer>,
@@ -37,7 +37,7 @@ pub fn setup_ui(
         (5.0, 10)
     };
 
-    // --- KHUNG 1: STATS BÊN TRÁI ---
+    // STATS BÊN TRÁI
     commands
         .spawn(( 
             NodeBundle {
@@ -93,7 +93,7 @@ pub fn setup_ui(
             ));
         });
 
-    // --- KHUNG 2: TIMER BÊN PHẢI ---
+    //TIMER
     commands.spawn((
         TextBundle::from_section(
             "00:00", 
@@ -110,7 +110,6 @@ pub fn setup_ui(
     ));
 }
 
-// Cập nhật số liệu Máu và Tiền
 pub fn update_ui(
     player_query: Query<&PlayerStats, (With<Player>, Changed<PlayerStats>)>,
     mut hp_text_query: Query<&mut Text, (With<HpText>, Without<MoneyText>)>,

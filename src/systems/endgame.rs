@@ -67,7 +67,6 @@ fn spawn_endgame_screen(
     let minutes = (time / 60.0).floor() as u32;
     let seconds = (time % 60.0).floor() as u32;
 
-    // --- LỚP NỀN TỐI (OVERLAY) ---
     commands.spawn((
         NodeBundle {
             style: Style {
@@ -75,17 +74,14 @@ fn spawn_endgame_screen(
                 height: Val::Percent(100.0),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
-                // --- SỬA Ở ĐÂY: Xóa background_color khỏi Style ---
                 ..default()
             },
-            // --- ĐƯA NÓ RA NGOÀI STYLE ---
             background_color: Color::srgba(0.0, 0.0, 0.0, 0.7).into(), 
             ..default()
         },
         EndgameUI,
     )).with_children(|parent| {
 
-        // --- TẤM BẢNG ---
         parent.spawn(ImageBundle {
             style: Style {
                 width: Val::Px(350.0),
@@ -99,8 +95,6 @@ fn spawn_endgame_screen(
             image: UiImage::new(board_texture),
             ..default()
         }).with_children(|board| {
-
-            // TIÊU ĐỀ
             board.spawn(TextBundle::from_section(
                 title,
                 TextStyle {

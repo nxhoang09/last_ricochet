@@ -1,4 +1,3 @@
-use bevy::prelude::*;
 
 #[derive(Clone, Copy)]
 pub enum EnemyType {
@@ -26,23 +25,23 @@ impl LevelConfig {
                 difficulty_multiplier: 1.0,
                 waves: vec![
                     WaveData { enemy_count: 5, spawn_interval: 1.5, enemy_type: EnemyType::Normal },
-                    // WaveData { enemy_count: 8, spawn_interval: 1.2, enemy_type: EnemyType::Normal },
+                    WaveData { enemy_count: 8, spawn_interval: 1.2, enemy_type: EnemyType::Normal },
                 ],
             },
             2 => LevelConfig {
-                difficulty_multiplier: 1.2, 
+                difficulty_multiplier: 1.5, 
                 waves: vec![
                     WaveData { enemy_count: 8, spawn_interval: 1.2, enemy_type: EnemyType::Normal },
-                    WaveData { enemy_count: 5, spawn_interval: 1.5, enemy_type: EnemyType::Speed }, 
+                    WaveData { enemy_count: 8, spawn_interval: 1.5, enemy_type: EnemyType::Speed }, 
                     WaveData { enemy_count: 10, spawn_interval: 1.0, enemy_type: EnemyType::Normal },
                 ],
             },
             3 => LevelConfig {
-                difficulty_multiplier: 1.5,
+                difficulty_multiplier: 2.0,
                 waves: vec![
                     WaveData { enemy_count: 10, spawn_interval: 1.0, enemy_type: EnemyType::Normal },
-                    WaveData { enemy_count: 4, spawn_interval: 2.0, enemy_type: EnemyType::Tank }, 
-                    WaveData { enemy_count: 15, spawn_interval: 0.8, enemy_type: EnemyType::Speed },
+                    WaveData { enemy_count: 8, spawn_interval: 2.0, enemy_type: EnemyType::Tank }, 
+                    WaveData { enemy_count: 25, spawn_interval: 0.8, enemy_type: EnemyType::Speed },
                 ],
             },
             _ => LevelConfig {

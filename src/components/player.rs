@@ -11,7 +11,7 @@ pub struct MovementStats {
 impl Default for MovementStats {
     fn default() -> Self {
         Self {
-            speed: 250.0, 
+            speed: 300.0, 
         }
     }
 }

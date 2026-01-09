@@ -27,10 +27,6 @@ pub fn enemy_movement(
 
         enemy_transform.translation += (direction * enemy_speed.speed * time.delta_seconds()).extend(0.0);
 
-        if direction.x < 0.0 {
-            sprite.flip_x = true;
-        } else {
-            sprite.flip_x = false;
-        }
+        sprite.flip_x = direction.x < 0.0;
     }
 }

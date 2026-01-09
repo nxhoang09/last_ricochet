@@ -4,11 +4,10 @@ use crate::resources::sound::SoundAssets;
 
 const FONT_PATH: &str = "fonts/pixel_3.ttf";
 
-// --- MÀU SẮC MỚI ---
-const TITLE_COLOR: Color = Color::srgb(1.0, 0.84, 0.0); // Vàng Gold
-const NORMAL_TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9); // Trắng hơi xám
-const HOVERED_TEXT_COLOR: Color = Color::srgb(1.0, 1.0, 0.0); // Vàng tươi khi hover
-const PRESSED_TEXT_COLOR: Color = Color::srgb(0.8, 0.8, 0.0); // Vàng đậm khi ấn
+const TITLE_COLOR: Color = Color::srgb(1.0, 0.84, 0.0); 
+const NORMAL_TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const HOVERED_TEXT_COLOR: Color = Color::srgb(1.0, 1.0, 0.0); 
+const PRESSED_TEXT_COLOR: Color = Color::srgb(0.8, 0.8, 0.0); 
 
 #[derive(Component)]
 pub struct MenuUI;
@@ -31,7 +30,7 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load(FONT_PATH);
     let bg_image = asset_server.load("sprites/ui/menu_bg.png"); 
 
-    // 1. Background
+    // Background
     commands.spawn((
         ImageBundle {
             style: Style {
@@ -45,7 +44,7 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
         MenuUI,
     ));
 
-    // 2. Container Chính
+    // Container Chính
     commands.spawn((
         NodeBundle {
             style: Style {
@@ -62,7 +61,6 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
         MenuUI,
     )).with_children(|parent| {
         
-        // --- CỘT TRÁI: TITLE ---
         parent.spawn(TextBundle::from_section(
             "LAST\nRICOCHET",
             TextStyle {
@@ -74,29 +72,28 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             margin: UiRect::bottom(Val::Px(100.0)),
             ..default()
         }));
-
-        // --- CỘT PHẢI: BẢNG ĐIỀU KHIỂN ---
         parent.spawn(NodeBundle {
             style: Style {
                 flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
-                // Căn chỉnh khung bảng (khớp với hình ảnh)
-                width: Val::Px(350.0), 
-                height: Val::Px(500.0), 
-                margin: UiRect::right(Val::Px(50.0)), 
+                width: Val::Px(300.0), 
+                height: Val::Px(450.0), 
+                margin: UiRect {
+                    right: Val::Percent(5.0), 
+                    top: Val::Px(0.0),        
+                    ..default()
+                },
                 ..default()
             },
             ..default()
         }).with_children(|board| {
-            
-            // === LỚP 1: MENU CHÍNH ===
             board.spawn((
                 NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
-                        row_gap: Val::Px(25.0), // Tăng khoảng cách giữa các nút
+                        row_gap: Val::Px(25.0), 
                         display: Display::Flex,
                         ..default()
                     },
@@ -104,13 +101,11 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },
                 MainMenuNode,
             )).with_children(|menu| {
-                // Tăng font size lên 35.0 (lớn hơn cũ)
                 spawn_button(menu, &font, "PLAY GAME", MenuButtonAction::Play, 35.0);
                 spawn_button(menu, &font, "TUTORIAL", MenuButtonAction::Tutorial, 35.0);
                 spawn_button(menu, &font, "EXIT", MenuButtonAction::Exit, 35.0);
             });
 
-            // === LỚP 2: TUTORIAL ===
             board.spawn((
                 NodeBundle {
                     style: Style {
@@ -126,13 +121,19 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
             )).with_children(|tutorial| {
                 tutorial.spawn(TextBundle::from_section(
                     "HOW TO PLAY",
-                    TextStyle { font: font.clone(), font_size: 25.0, color: TITLE_COLOR },
+                    TextStyle { font: font.clone(), font_size: 30.0, color: TITLE_COLOR },
                 ));
 
-                let instructions = "WASD: Move\nMouse: Aim\nClick: Shoot\n\nKill enemies\nto survive!";
+                let instructions = "WASD: Move\n\
+                    Left Click: Shoot\n\
+                    Hold Shift: Slow Aura\n\
+                    Space: Kick Aura\n\
+                    Space (Shop): Buy Item\n\n\
+                    Aura: A protective circle that slows\n\
+                    down or pushes incoming bullets.";
                 tutorial.spawn(TextBundle::from_section(
                     instructions,
-                    TextStyle { font: font.clone(), font_size: 18.0, color: Color::WHITE },
+                    TextStyle { font: font.clone(), font_size: 20.0, color: Color::WHITE },
                 ).with_text_justify(JustifyText::Center));
 
                 spawn_button(tutorial, &font, "BACK", MenuButtonAction::BackToMenu, 30.0);
@@ -141,24 +142,21 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     });
 }
 
-// HÀM SPAWN BUTTON ĐÃ CẢI TIẾN
 fn spawn_button(
     parent: &mut ChildBuilder, 
     font: &Handle<Font>, 
     text: &str, 
     action: MenuButtonAction,
-    font_size: f32, // Thêm tham số size để linh hoạt
+    font_size: f32, 
 ) {
     parent.spawn((
         ButtonBundle {
             style: Style {
-                // Không set width cố định để nút tự co giãn theo chữ
                 padding: UiRect::all(Val::Px(10.0)), 
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 ..default()
             },
-            // QUAN TRỌNG: Màu nền trong suốt
             background_color: BackgroundColor(Color::NONE), 
             ..default()
         },
@@ -168,7 +166,7 @@ fn spawn_button(
             text,
             TextStyle {
                 font: font.clone(),
-                font_size: font_size, // Dùng size to hơn
+                font_size, 
                 color: NORMAL_TEXT_COLOR,
             },
         ));
@@ -192,24 +190,20 @@ pub fn menu_action(
 ) {
     for (interaction, action, children, mut transform) in &mut interaction_query {
         
-        // 1. Xác định trạng thái để chọn màu và tỷ lệ (scale)
         let (text_color, scale) = match *interaction {
             Interaction::Pressed => (PRESSED_TEXT_COLOR, 1.05),
-            Interaction::Hovered => (HOVERED_TEXT_COLOR, 1.2), // Phóng to 1.2 lần khi hover
-            Interaction::None => (NORMAL_TEXT_COLOR, 1.0),     // Về bình thường
+            Interaction::Hovered => (HOVERED_TEXT_COLOR, 1.2),
+            Interaction::None => (NORMAL_TEXT_COLOR, 1.0),   
         };
 
-        // 2. Áp dụng hiệu ứng phóng to cho nút
         transform.scale = Vec3::splat(scale);
 
-        // 3. Áp dụng đổi màu cho Text con
         for &child in children.iter() {
             if let Ok(mut text) = text_query.get_mut(child) {
                 text.sections[0].style.color = text_color;
             }
         }
 
-        // 4. Xử lý logic bấm nút (giữ nguyên logic cũ)
         if *interaction == Interaction::Pressed {
             commands.spawn(AudioBundle {
                 source: sound_assets.select.clone(),
